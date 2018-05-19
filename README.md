@@ -19,9 +19,9 @@ The model calculates the state for the current timestep based on the following e
 The values chosen for N is 10 and dt is 0.1 as suggested by Udacity's Q&A video. 
 These values mean that the optimizer is considering a one-second duration in which to determine a corrective trajectory. 
 I've also tried 
- - 10 / 0.05 which produced more accurate trajectory points for 0.5 sec but some how limited car speed
- - 20 / 0.05 which produced more accurate trajectory points but incleased processing time and caused more latency
- - 10 / 0.2 which caused a delayed trajectory corrective actions and caused the car to jump out of the road in the turns.
+  10 / 0.05 which produced more accurate trajectory points for 0.5 sec but some how limited car speed
+  20 / 0.05 which produced more accurate trajectory points but incleased processing time and caused more latency
+  10 / 0.2 which caused a delayed trajectory corrective actions and caused the car to jump out of the road in the turns.
 
 
 - **Polynomial Fitting and MPC Preprocessing**: *A polynomial is fitted to waypoints. If the student preprocesses waypoints, the vehicle state, and/or actuators prior to the MPC procedure it is described.*
