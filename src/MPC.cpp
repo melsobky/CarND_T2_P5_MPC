@@ -32,7 +32,7 @@ double ref_v = 70;
 #define CTE_W 3000
 #define EPSI_W 2000
 #define V_W 1
-#define DELTA_W 500
+#define DELTA_W 1000
 #define A_W 10
 #define D_DELTA_W 1
 #define D_A_W 1
