@@ -3,21 +3,30 @@
 
 ## Intro
 
-The goal of this project is to navigate a track in a Udacity-provided [simulator](https://github.com/udacity/self-driving-car-sim/releases), which communicates telemetry and track waypoint data via websocket, by sending steering and acceleration commands back to the simulator. The solution takes into account a 100ms latency, as one may encounter in real-world application.
+This project is an implementation for the MPC. Tested on Udacity term 2 simulator. Poroject takes 100ms delay into account.
 
 ## Rubric Points
 
 - **The Model**: *Student describes their model in detail. This includes the state, actuators and update equations.*
 
-The kinematic model includes the vehicle's x and y coordinates, orientation angle (psi), and velocity, as well as the cross-track error and psi error (epsi). Actuator outputs are acceleration and delta (steering angle). The model combines the state and actuations from the previous timestep to calculate the state for the current timestep based on the equations below:
+The kinematic model includes the vehicle's x and y coordinates, orientation angle (psi), velocity, CTE and psi error (epsi). 
+The model calculates the state for the current timestep based on the following equations :
+
+![model equations](./model_equations.png)
 
 - **Timestep Length and Elapsed Duration (N & dt)**: *Student discusses the reasoning behind the chosen N (timestep length) and dt (elapsed duration between timesteps) values. Additionally the student details the previous values tried.*
 
-The values chosen for N and dt are 10 and 0.1, respectively. Admittedly, this was at the suggestion of Udacity's provided office hours for the project. These values mean that the optimizer is considering a one-second duration in which to determine a corrective trajectory. Adjusting either N or dt (even by small amounts) often produced erratic behavior. Other values tried include 10 / 0.05. 
+The values chosen for N is 10 and dt is 0.1 as suggested by Udacity's Q&A video. 
+These values mean that the optimizer is considering a one-second duration in which to determine a corrective trajectory. 
+I've also tried 
+- 10 / 0.05 which produced more accurate trajectory points for 0.5 sec but some how limited car speed
+- 20 / 0.05 which produced more accurate trajectory points but incleased processing time and caused more latency
+- 10 / 0.2 which caused a delayed trajectory corrective actions and caused the car to jump out of the road in the turns.
+
 
 - **Polynomial Fitting and MPC Preprocessing**: *A polynomial is fitted to waypoints. If the student preprocesses waypoints, the vehicle state, and/or actuators prior to the MPC procedure it is described.*
 
-The waypoints are preprocessed by transforming them to the vehicle's perspective (see main.cpp lines 95-100). This simplifies the process to fit a polynomial to the waypoints because the vehicle's x and y coordinates are now at the origin (0, 0) and the orientation angle is also zero. 
+As a preprocessing step i transformed the waypoints (in simulator coordenate system) to vehicle's prespective which simplified the polynomial fitteng. I used the povided polynomial fitting function to perform the operation.
 
 - **Model Predictive Control with Latency**: *The student implements Model Predictive Control that handles a 100 millisecond latency. Student provides details on how they deal with latency.*
 
