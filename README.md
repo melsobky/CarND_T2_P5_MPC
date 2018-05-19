@@ -12,7 +12,7 @@ This project is an implementation for the MPC. Tested on Udacity term 2 simulato
 The kinematic model includes the vehicle's x and y coordinates, orientation angle (psi), velocity, CTE and psi error (epsi). 
 The model calculates the state for the current timestep based on the following equations :
 
-![model equations](./model_equations.png)
+![](./model_equations.PNG)
 
 - **Timestep Length and Elapsed Duration (N & dt)**: *Student discusses the reasoning behind the chosen N (timestep length) and dt (elapsed duration between timesteps) values. Additionally the student details the previous values tried.*
 
