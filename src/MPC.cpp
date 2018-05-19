@@ -30,10 +30,10 @@ double ref_epsi = 0;
 double ref_v = 70;
 
 #define CTE_W 3000
-#define EPSI_W 3000
+#define EPSI_W 2000
 #define V_W 1
-#define DELTA_W 200
-#define A_W 20
+#define DELTA_W 500
+#define A_W 10
 #define D_DELTA_W 1
 #define D_A_W 1
 
@@ -64,20 +64,20 @@ class FG_eval {
     fg[0] = 0;
 
     // The part of the cost based on the reference state.
-    for (int t = 0; t < N; t++) {
+    for (unsigned int t = 0; t < N; t++) {
       fg[0] += CTE_W*CppAD::pow(vars[cte_start + t] - ref_cte, 2);
       fg[0] += EPSI_W*CppAD::pow(vars[epsi_start + t] - ref_epsi, 2);
       fg[0] += V_W*CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
     // Minimize the use of actuators.
-    for (int t = 0; t < N - 1; t++) {
+    for (unsigned int t = 0; t < N - 1; t++) {
       fg[0] += DELTA_W*CppAD::pow(vars[delta_start + t], 2);
       fg[0] += A_W*CppAD::pow(vars[a_start + t], 2);
     }
 
     // Minimize the value gap between sequential actuations.
-    for (int t = 0; t < N - 2; t++) {
+    for (unsigned int t = 0; t < N - 2; t++) {
       fg[0] += D_DELTA_W*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
       fg[0] += D_A_W*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
@@ -100,7 +100,7 @@ class FG_eval {
     fg[1 + epsi_start] = vars[epsi_start];
 
     // The rest of the constraints
-    for (int t = 1; t < N; t++) {
+    for (unsigned int t = 1; t < N; t++) {
       // The state at time t+1 .
       AD<double> x1 = vars[x_start + t];
       AD<double> y1 = vars[y_start + t];
@@ -170,7 +170,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Initial value of the independent variables.
   // Should be 0 except for the initial values.
   Dvector vars(n_vars);
-  for (int i = 0; i < n_vars; i++) {
+  for (unsigned int i = 0; i < n_vars; i++) {
     vars[i] = 0.0;
   }
   
@@ -188,7 +188,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
   // Set all non-actuators upper and lowerlimits
   // to the max negative and positive values.
-  for (int i = 0; i < delta_start; i++) {
+  for (unsigned int i = 0; i < delta_start; i++) {
     vars_lowerbound[i] = -1.0e19;
     vars_upperbound[i] = 1.0e19;
   }
@@ -196,14 +196,14 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // The upper and lower limits of delta are set to -25 and 25
   // degrees (values in radians).
   // NOTE: Feel free to change this to something else.
-  for (int i = delta_start; i < a_start; i++) {
+  for (unsigned int i = delta_start; i < a_start; i++) {
     vars_lowerbound[i] = -0.436332*Lf;
     vars_upperbound[i] = 0.436332*Lf;
   }
 
   // Acceleration/decceleration upper and lower limits.
   // NOTE: Feel free to change this to something else.
-  for (int i = a_start; i < n_vars; i++) {
+  for (unsigned int i = a_start; i < n_vars; i++) {
     vars_lowerbound[i] = -1.0;
     vars_upperbound[i] = 1.0;
   }
@@ -213,7 +213,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // state indices.
   Dvector constraints_lowerbound(n_constraints);
   Dvector constraints_upperbound(n_constraints);
-  for (int i = 0; i < n_constraints; i++) {
+  for (unsigned int i = 0; i < n_constraints; i++) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
@@ -271,10 +271,11 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   vector<double> solved;
   solved.push_back(solution.x[delta_start]);
   solved.push_back(solution.x[a_start]);
-  for (int i = 0; i < N-1; ++i) {
+  for (unsigned int i = 0; i < N-1; ++i) {
     solved.push_back(solution.x[x_start + i + 1]);
     solved.push_back(solution.x[y_start + i + 1]);
   }
   
   return solved;
+
 }
