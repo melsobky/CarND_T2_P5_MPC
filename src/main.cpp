@@ -93,7 +93,7 @@ int main() {
 
           
           // Transform the points to the vehicle's orientation
-          for (int i = 0; i < ptsx.size(); i++) {
+          for (unsigned int i = 0; i < ptsx.size(); i++) {
             double x = ptsx[i] - px;
             double y = ptsy[i] - py;
             ptsx[i] = x * cos(-psi) - y * sin(-psi);
@@ -116,17 +116,32 @@ int main() {
 
           // Fits a 3rd-order polynomial to the above x and y coordinates
           auto coeffs = polyfit(ptsx_car, ptsy_car, 3);
-          
-          // Calculates the cte & epsi
-          double cte = polyeval(coeffs, 0);
-          double epsi = -atan(coeffs[1]);
 
-	  double steer_value = j[1]["steering_angle"];
-	  double throttle_value = j[1]["throttle"];
+	  const double latency = 0.1; //100 ms
+
+	  double Lf = 2.67;
+
+          // Calculates the cte & epsi
+	  double px0 = 0;
+	  double py0 = 0;
+	  double psi0 = 0;
+          double cte0 = polyeval(coeffs, 0);
+          double epsi0 = -atan(coeffs[1]);
+
+	  double delta = j[1]["steering_angle"];
+	  double a = j[1]["throttle"];
+
+          // State after latency.
+          px = px0 + ( v * cos(psi0) * latency );
+          py = py0 + ( v * sin(psi0) * latency );
+          double cte = cte0 + ( v * sin(epsi0) * latency );
+	  double epsi = epsi0 - v * delta * latency / Lf;
+          psi = psi0 - v * delta * latency / Lf;
+          v = v + a * latency;
                 
           // Feed in the predicted state values
           Eigen::VectorXd state(6);
-          state << 0, 0, 0, v, cte, epsi;
+          state << px, py, psi, v, cte, epsi;
           
           auto vars = mpc.Solve(state, coeffs);
           
@@ -152,12 +167,12 @@ int main() {
           // add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
           
-          for (int i = 2; i < vars.size(); i+=2) {
+          for (unsigned int i = 2; i < vars.size(); i+=2) {
             mpc_x_vals.push_back(vars[i]);
             mpc_y_vals.push_back(vars[i+1]);
           }
 
-	  double Lf = 2.67;
+	  
     
           // Send values to the simulator
           json msgJson;
