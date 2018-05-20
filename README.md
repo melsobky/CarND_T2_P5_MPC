@@ -30,8 +30,7 @@ As a preprocessing step i transformed the waypoints (in simulator coordenate sys
 
 - **Model Predictive Control with Latency**: *The student implements Model Predictive Control that handles a 100 millisecond latency. Student provides details on how they deal with latency.*
 
-The approach to dealing with latency is that the original kinematic equations depend upon the actuations from the previous timestep, but with a delay of 100ms the actuations are applied another timestep later, so the equations have been altered to account for this (MPC.cpp lines 125-128).
-
+To account for latency i predected the model state for a latency of 100 ms and used this state to control the vehicle. 
 
 ---
 
